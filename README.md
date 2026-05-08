@@ -67,6 +67,10 @@ That means your laptop does not need to be open for RepoPulse to preserve traffi
 
 ## Quick Start
 
+Download the latest desktop installer from the [RepoPulse releases page](https://github.com/exie1122/repopulse/releases/latest).
+
+For development:
+
 ```bash
 git clone https://github.com/exie1122/repopulse
 cd repopulse

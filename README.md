@@ -137,53 +137,47 @@ repopulse --db /var/lib/repopulse/repopulse.db sync
 
 ## Raspberry Pi Setup
 
-Install build dependencies and Rust:
-
-```bash
-sudo apt update
-sudo apt install -y build-essential pkg-config libssl-dev
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source "$HOME/.cargo/env"
-```
-
-Build and install the CLI:
+For the simple path, clone RepoPulse on the Pi and run the installer:
 
 ```bash
 git clone https://github.com/exie1122/repopulse
 cd repopulse
-cargo build -p repopulse-cli --release
-sudo install -m 755 target/release/repopulse /usr/local/bin/repopulse
+./installer
 ```
 
-Create the token file used by systemd:
+The installer prompts for your GitHub token without showing it on screen, asks which repos to track, builds the CLI, writes `/etc/repopulse.env`, installs the systemd service, and starts the collector.
+
+If you want the one-line version:
 
 ```bash
-sudo tee /etc/repopulse.env >/dev/null <<'EOF'
-REPOPULSE_GITHUB_TOKEN=ghp_your_token_here
-EOF
-sudo chmod 600 /etc/repopulse.env
+./installer ghp_your_token owner/repo another-owner/another-repo
 ```
 
-Track a repo and test the collector:
+Passing a token as an argument is convenient, but it may be saved in shell history. The safer version is:
 
 ```bash
-sudo install -d -o pi -g pi /var/lib/repopulse
-export REPOPULSE_GITHUB_TOKEN="ghp_your_token_here"
-repopulse --db /var/lib/repopulse/repopulse.db track owner/repo
-repopulse --db /var/lib/repopulse/repopulse.db sync
+./installer
+```
+
+You can also set the token through an environment variable:
+
+```bash
+REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer owner/repo
+```
+
+After install:
+
+```bash
 repopulse --db /var/lib/repopulse/repopulse.db status
+systemctl status repopulse
+sudo journalctl -u repopulse -f
 ```
 
-Install the service:
+By default the installer stores data at `/var/lib/repopulse/repopulse.db` and syncs every 4 hours. Change the interval with:
 
 ```bash
-sudo cp packaging/systemd/repopulse.service.example /etc/systemd/system/repopulse.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now repopulse
-systemctl status repopulse
+./installer --interval-minutes 120
 ```
-
-The example service runs as user `pi`, stores data at `/var/lib/repopulse/repopulse.db`, and syncs every 4 hours. Edit `/etc/systemd/system/repopulse.service` if your Pi user or preferred path is different.
 
 ## Data Location
 

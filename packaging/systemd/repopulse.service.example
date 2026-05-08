@@ -1,0 +1,17 @@
+[Unit]
+Description=RepoPulse GitHub traffic collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+EnvironmentFile=/etc/repopulse.env
+StateDirectory=repopulse
+ExecStart=/usr/local/bin/repopulse --db /var/lib/repopulse/repopulse.db daemon --interval-minutes 240
+Restart=always
+RestartSec=30
+
+[Install]
+WantedBy=multi-user.target

@@ -56,21 +56,21 @@ jobs:
           workspaces: ". -> target"
 
       - name: Install JS deps
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "RepoPulse ${{ github.ref_name }}"
-          releaseBody: "See CHANGELOG for details."
-          releaseDraft: true
-          prerelease: false
+        run: pnpm tauri build
 
       - name: Build CLI
         run: cargo build -p repopulse-cli --release
+
+      - name: Upload app bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: repopulse-app-${{ matrix.os }}
+          path: |
+            target/release/bundle/**
+          if-no-files-found: ignore
 
       - name: Upload CLI artifact
         uses: actions/upload-artifact@v4

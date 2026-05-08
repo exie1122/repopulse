@@ -6,6 +6,12 @@ GitHub only keeps repository traffic for a short rolling window. RepoPulse quiet
 
 No SaaS account. No hosted backend. No Docker required. Your data stays on your machine, or on a Raspberry Pi tucked in a drawer doing the collecting for you.
 
+![RepoPulse dashboard overview showing portfolio totals and project cards](docs/dashboard-overview.png)
+
+<p align="center">
+  <img src="docs/repo-detail.png" alt="RepoPulse project detail dashboard with traffic charts and layout controls" width="82%">
+</p>
+
 ## Why RepoPulse?
 
 If you build projects and move on, GitHub's built-in traffic page is easy to forget until the numbers are already gone. RepoPulse is for solo builders, students, maintainers, and small teams who want a long-term memory of what people actually looked at, cloned, released, or found through search and links.

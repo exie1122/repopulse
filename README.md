@@ -213,6 +213,14 @@ Run the desktop app:
 pnpm tauri dev
 ```
 
+Run screenshot/demo mode in a browser:
+
+```bash
+pnpm demo
+```
+
+Demo mode uses polished sample repositories and traffic history instead of Tauri IPC, so it is safe for README screenshots and does not expose your real GitHub data.
+
 Project layout:
 
 ```text

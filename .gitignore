@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .env
+!.env.demo
 target/
 src-tauri/target/
 src-tauri/gen/

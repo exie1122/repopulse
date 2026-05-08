@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-export default defineConfig(async () => ({
+export default defineConfig(async ({ mode }) => ({
   plugins: [react()],
   clearScreen: false,
   server: {
-    port: 1420,
-    strictPort: true,
+    port: mode === "demo" ? 1421 : 1420,
+    strictPort: mode !== "demo",
     watch: {
       ignored: ["**/src-tauri/**"],
     },

@@ -14,16 +14,16 @@ usage() {
 RepoPulse Raspberry Pi installer
 
 Usage:
-  ./install-rpi.sh
-  ./install-rpi.sh ghp_your_token owner/repo another/repo
-  REPOPULSE_GITHUB_TOKEN=ghp_your_token ./install-rpi.sh owner/repo
+  ./installer
+  ./installer ghp_your_token owner/repo another/repo
+  REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer owner/repo
 
 Options:
   --interval-minutes N   Sync interval. Default: 240
   --help                 Show this help
 
-The safest path is running without a token argument. The installer will prompt
-for it without echoing it into your terminal history.
+Run ./installer by itself for the safest path. It will prompt for your token
+without showing it on screen, then ask which repositories to track.
 EOF
 }
 
@@ -70,7 +70,7 @@ while [[ $# -gt 0 ]]; do
         die "Token was provided more than once"
       fi
       TOKEN="$1"
-      warn "Passing tokens as command arguments can leave them in shell history. Prefer running ./install-rpi.sh and using the hidden prompt."
+      warn "Passing tokens as command arguments can leave them in shell history. Prefer running ./installer and using the hidden prompt."
       shift
       ;;
     *)
@@ -108,6 +108,12 @@ if [[ ${#REPOS[@]} -eq 0 ]]; then
     read -r -a REPOS <<<"$REPO_LINE"
   fi
 fi
+
+for repo in "${REPOS[@]}"; do
+  if [[ ! "$repo" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]]; then
+    die "Repository '$repo' should look like owner/repo"
+  fi
+done
 
 info "Installing system dependencies"
 if need_cmd apt-get; then

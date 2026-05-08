@@ -137,7 +137,7 @@ repopulse --db /var/lib/repopulse/repopulse.db sync
 
 ## Raspberry Pi Setup
 
-For the simple path, clone RepoPulse on the Pi and run the installer:
+For the simple path, clone RepoPulse on the Pi and run one command:
 
 ```bash
 git clone https://github.com/exie1122/repopulse
@@ -147,7 +147,7 @@ cd repopulse
 
 The installer prompts for your GitHub token without showing it on screen, asks which repos to track, builds the CLI, writes `/etc/repopulse.env`, installs the systemd service, and starts the collector.
 
-If you want the one-line version:
+For a fully non-interactive install, pass the token and repos directly:
 
 ```bash
 ./installer ghp_your_token owner/repo another-owner/another-repo

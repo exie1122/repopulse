@@ -15,15 +15,17 @@ RepoPulse Raspberry Pi installer
 
 Usage:
   ./installer
+  ./installer ghp_your_token
   ./installer ghp_your_token owner/repo another/repo
-  REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer owner/repo
+  REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer
 
 Options:
   --interval-minutes N   Sync interval. Default: 240
   --help                 Show this help
 
 Run ./installer by itself for the safest path. It will prompt for your token
-without showing it on screen, then ask which repositories to track.
+without showing it on screen, then track every repository available to that token.
+Pass owner/repo arguments only if you want to track a smaller set.
 EOF
 }
 
@@ -101,14 +103,6 @@ fi
 
 [[ -n "$TOKEN" ]] || die "A GitHub token is required"
 
-if [[ ${#REPOS[@]} -eq 0 ]]; then
-  printf "Repositories to track, separated by spaces (owner/repo): "
-  read -r REPO_LINE
-  if [[ -n "${REPO_LINE:-}" ]]; then
-    read -r -a REPOS <<<"$REPO_LINE"
-  fi
-fi
-
 for repo in "${REPOS[@]}"; do
   if [[ ! "$repo" =~ ^[^/[:space:]]+/[^/[:space:]]+$ ]]; then
     die "Repository '$repo' should look like owner/repo"
@@ -147,13 +141,14 @@ printf 'REPOPULSE_GITHUB_TOKEN=%s\n' "$TOKEN" | sudo tee "$ENV_PATH" >/dev/null
 sudo chmod 600 "$ENV_PATH"
 
 if [[ ${#REPOS[@]} -gt 0 ]]; then
-  info "Tracking repositories"
+  info "Tracking selected repositories"
   for repo in "${REPOS[@]}"; do
     printf 'Tracking %s\n' "$repo"
     REPOPULSE_GITHUB_TOKEN="$TOKEN" "$BIN_PATH" --db "$DB_PATH" track "$repo"
   done
 else
-  warn "No repositories were added. You can add one later with: REPOPULSE_GITHUB_TOKEN=... repopulse --db $DB_PATH track owner/repo"
+  info "Tracking all repositories available to this token"
+  REPOPULSE_GITHUB_TOKEN="$TOKEN" "$BIN_PATH" --db "$DB_PATH" track-all
 fi
 
 info "Installing systemd service"

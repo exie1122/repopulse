@@ -37,6 +37,8 @@ enum Commands {
         /// Repository full name, e.g. owner/repo
         repo: String,
     },
+    /// Track every repository available to the configured token
+    TrackAll,
     /// Stop tracking a repository by full name, e.g. owner/repo
     Untrack {
         /// Repository full name, e.g. owner/repo
@@ -79,6 +81,7 @@ async fn main() -> Result<()> {
         Commands::Sync => cmd_sync(&db).await,
         Commands::Daemon { interval_minutes } => cmd_daemon(&db, interval_minutes).await,
         Commands::Track { repo } => cmd_track(&db, &repo).await,
+        Commands::TrackAll => cmd_track_all(&db).await,
         Commands::Untrack { repo } => cmd_untrack(&db, &repo),
         Commands::ListRepos => cmd_list_repos(&db),
         Commands::Status => cmd_status(&db),
@@ -152,6 +155,34 @@ async fn cmd_track(db: &Arc<Mutex<rusqlite::Connection>>, full_name: &str) -> Re
     db::upsert_repo(&conn, &repo)?;
     db::set_tracking(&conn, repo.id as i64, true)?;
     println!("Tracking {}", repo.full_name);
+    Ok(())
+}
+
+async fn cmd_track_all(db: &Arc<Mutex<rusqlite::Connection>>) -> Result<()> {
+    let tok = token::load()
+        .context("No GitHub token configured. Set REPOPULSE_GITHUB_TOKEN or GITHUB_TOKEN first.")?;
+    let client = GitHubClient::new(tok);
+    let repos = client
+        .list_repos()
+        .await
+        .context("Failed to list repositories from GitHub")?;
+
+    if repos.is_empty() {
+        println!("GitHub returned no repositories for this token.");
+        return Ok(());
+    }
+
+    let conn = db.lock().unwrap();
+    for repo in &repos {
+        db::upsert_repo(&conn, repo)?;
+        db::set_tracking(&conn, repo.id as i64, true)?;
+    }
+
+    println!("Tracking {} repo(s).", repos.len());
+    for repo in &repos {
+        println!("  {}", repo.full_name);
+    }
+
     Ok(())
 }
 

@@ -120,6 +120,7 @@ Common commands:
 
 ```bash
 repopulse track owner/repo
+repopulse track-all
 repopulse untrack owner/repo
 repopulse sync
 repopulse daemon --interval-minutes 240
@@ -145,9 +146,15 @@ cd repopulse
 ./installer
 ```
 
-The installer prompts for your GitHub token without showing it on screen, asks which repos to track, builds the CLI, writes `/etc/repopulse.env`, installs the systemd service, and starts the collector.
+The installer prompts for your GitHub token without showing it on screen, finds your repositories, builds the CLI, writes `/etc/repopulse.env`, installs the systemd service, and starts the collector.
 
-For a fully non-interactive install, pass the token and repos directly:
+By default it tracks every repository available to your token. For a fully non-interactive install:
+
+```bash
+./installer ghp_your_token
+```
+
+If you only want a few repos, pass them after the token:
 
 ```bash
 ./installer ghp_your_token owner/repo another-owner/another-repo
@@ -162,7 +169,7 @@ Passing a token as an argument is convenient, but it may be saved in shell histo
 You can also set the token through an environment variable:
 
 ```bash
-REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer owner/repo
+REPOPULSE_GITHUB_TOKEN=ghp_your_token ./installer
 ```
 
 After install:
